@@ -3,15 +3,15 @@
 <head>
   <title>Image to Sound</title>
   <style>
-    body { font-family: sans-serif; background: #111; color: #eee; text-align: center; }
-    canvas { margin-top: 10px; }
+    body { font-family: sans-serif; background: #111; color: #eee; text-align: Left; }
+    canvas { margin-top: 10px; margin-left: 10px; }
   </style>
 </head>
 <body>
-  <h1>🖼️ Image to Sound</h1>
+  <h1>Image to Sound</h1>
   <input type="file" id="fileInput"><br>
   <canvas id="canvas" width="32" height="32"></canvas><br>
-  <button onclick="playImageSound()">🔊 Transmit</button>
+  <button onclick="playImageSound()">Playback Sound</button>
 
   <script>
     const canvas = document.getElementById('canvas');
