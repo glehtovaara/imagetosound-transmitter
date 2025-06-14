@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Image to Sound</title>
+  <style>
+    body { font-family: sans-serif; background: #111; color: #eee; text-align: center; }
+    canvas { margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h1>🖼️ Image to Sound</h1>
+  <input type="file" id="fileInput"><br>
+  <canvas id="canvas" width="32" height="32"></canvas><br>
+  <button onclick="playImageSound()">🔊 Transmit</button>
+
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const fileInput = document.getElementById('fileInput');
+
+    let pixels = [];
+
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const img = new Image();
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0, 32, 32);
+        const imgData = ctx.getImageData(0, 0, 32, 32).data;
+        pixels = [];
+        for (let i = 0; i < imgData.length; i += 4) {
+          const r = imgData[i], g = imgData[i+1], b = imgData[i+2];
+          const gray = Math.round((r + g + b) / 3);
+          pixels.push(gray);
+        }
+      };
+      img.src = URL.createObjectURL(file);
+    });
+
+    async function playImageSound() {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      for (let i = 0; i < pixels.length; i++) {
+        const pixel = pixels[i];
+        const freq = 1000 + (pixel / 255) * 1000;
+        const osc = audioCtx.createOscillator();
+        osc.frequency.value = freq;
+        osc.type = 'sine';
+
+        const gain = audioCtx.createGain();
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime); // volume
+
+        osc.connect(gain).connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.01);
+        await new Promise(r => setTimeout(r, 10)); // wait for tone to finish
+      }
+    }
+  </script>
+</body>
+</html>
